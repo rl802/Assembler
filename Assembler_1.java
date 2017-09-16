@@ -9,6 +9,7 @@ package assembler_1;
  *
  * @author Sanjana13
  */
+import java.util.StringTokenizer;  
 import java.io.IOException;
 import java.io.FileReader;
 import java.io.BufferedReader;
@@ -61,9 +62,14 @@ public class Assembler_1 {
 
     }
     
-    void evaluate_line()
+    void evaluate_line(String in_line)
     {
-        
+        StringTokenizer st = new StringTokenizer(in_line," ");
+        int count = st.countTokens();
+        while(st.hasMoreTokens())
+        {
+            
+        }
     }
     public static void main(String[] args) throws IOException {
         // TODO code application logic here
