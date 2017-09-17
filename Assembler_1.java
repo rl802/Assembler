@@ -79,6 +79,9 @@ public class Assembler_1 {
     void pass_1() throws FileNotFoundException, IOException{
         int locctr=0;
         String[] str;
+        String hex_code;
+        int len;
+        int index_bit=0;
         // Open the file
 FileInputStream fstream = new FileInputStream("textfile.txt");
 BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
@@ -88,13 +91,37 @@ String strLine;
 //Read File Line By Line
 while ((strLine = br.readLine()) != null)   {
   // Split command into separate tokens
-  str= strLine.split("\\W+");
+  len=strLine.length();
+  str= strLine.split(",|\\s");
+  
+  /* Assigning addresses to each instruction */
+  
+  if(str[1].equals("START")){
+      if(str[1]!=null && !str[1].isEmpty())
+            locctr=Integer.parseInt(str[1]);
+  }
+        else{
+            if(str[1].equals("RESB"))
+               locctr=locctr+Integer.parseInt(str[2]);
+            else
+                if(str[1].equals("RESW"))
+                    locctr=locctr+(3*Integer.parseInt(str[2]));
+            else
+                if(str[1].equals("BYTE"))
+                   locctr++;
+            else
+                locctr=locctr+3;
+        }
+  String hex_addr=Integer.toHexString(locctr);
   
   if(str[0].equals("START"))
-            locctr=Integer.parseInt(str[1]);
-        else{
-            
-        }
+      break;
+  else
+      hex_code=t.check_optab(str[0]);
+  
+  if(str[2].equals("X"))
+      index_bit=1;
+  
 }
 
 //Close the input stream
