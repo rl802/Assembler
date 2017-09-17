@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 
 public class Assembler_1 {
 
@@ -85,6 +86,7 @@ public class Assembler_1 {
         // Open the file
 FileInputStream fstream = new FileInputStream("textfile.txt");
 BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+PrintWriter writer = new PrintWriter("obj_code.txt", "UTF-8");
 
 String strLine;
 
@@ -122,11 +124,17 @@ while ((strLine = br.readLine()) != null)   {
   if(str[2].equals("X"))
       index_bit=1;
   
+    
+    writer.println("Address \t Instruction \t Opcode");
+    writer.println(hex_addr+" \t"+strLine+" \t"+hex_code);
+    writer.close();
+
+  
 }
 
 //Close the input stream
 br.close();
-        
+     
     }
     
     void pass_2(){
