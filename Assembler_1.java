@@ -12,7 +12,10 @@ package assembler_1;
 import java.util.StringTokenizer;  
 import java.io.IOException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
@@ -24,83 +27,33 @@ public class Assembler_1 {
      * @param args the command line arguments
      */
     tables t;
-    void extract_assembly_code()
-    {
-       BufferedReader br = null;
-		FileReader fr = null;
-
-		try {
-
-			//br = new BufferedReader(new FileReader(FILENAME));
-			fr = new FileReader("");
-			br = new BufferedReader(fr);
-
-			String sCurrentLine;
-
-			while ((sCurrentLine = br.readLine()) != null) {
-				System.out.println(sCurrentLine);
-			}
-
-		} catch (IOException e) {
-
-			e.printStackTrace();
-
-		} finally {
-
-			try {
-
-				if (br != null)
-					br.close();
-
-				if (fr != null)
-					fr.close();
-
-			} catch (IOException ex) {
-
-				ex.printStackTrace();
-
-			}
-
-		}
-
-	
-
-    }
+    converter c;
     
-    void evaluate_line(String in_line)
-    {
-        StringTokenizer st = new StringTokenizer(in_line," ");
-        int count = st.countTokens();
-        while(st.hasMoreTokens())
-        {
-            
-        }
-    }
     
-    void pass_1() throws FileNotFoundException, IOException{
+void pass_1() throws FileNotFoundException, IOException{
         int locctr=0;
-        String[] str;
-        String hex_code;
+        String hex_code="";
         int len;
         int index_bit=0;
         // Open the file
-FileInputStream fstream = new FileInputStream("textfile.txt");
+FileInputStream fstream = new FileInputStream("C:\\Users\\rithika\\Documents\\Assembler\\assembler_1\\textfile.txt");
 BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
-PrintWriter writer = new PrintWriter("obj_code.txt", "UTF-8");
-
+FileWriter fw=new FileWriter("C:\\Users\\rithika\\Documents\\Assembler\\assembler_1\\obj_code1.txt");
+BufferedWriter bw=new BufferedWriter(fw);
+bw.write("Address Instruction Opcode");
 String strLine;
 
 //Read File Line By Line
 while ((strLine = br.readLine()) != null)   {
   // Split command into separate tokens
   len=strLine.length();
-  str= strLine.split(",|\\s");
+  String[] str= strLine.split(",|\\s");
   
   /* Assigning addresses to each instruction */
   
   if(str[1].equals("START")){
-      if(str[1]!=null && !str[1].isEmpty())
-            locctr=Integer.parseInt(str[1]);
+      if(str[2]!=null && !str[2].isEmpty())
+            locctr=Integer.parseInt(str[2]);
   }
         else{
             if(str[1].equals("RESB"))
@@ -116,34 +69,106 @@ while ((strLine = br.readLine()) != null)   {
         }
   String hex_addr=Integer.toHexString(locctr);
   
-  if(str[0].equals("START"))
+  if(str[1].equals("START")||str[0].equals("END"))
       break;
-  else
+else
       hex_code=t.check_optab(str[0]);
   
   if(str[2].equals("X"))
       index_bit=1;
   
     
-    writer.println("Address \t Instruction \t Opcode");
-    writer.println(hex_addr+" \t"+strLine+" \t"+hex_code);
-    writer.close();
+    
+    bw.write(hex_addr+" "+strLine+" "+hex_code);
+    
 
   
 }
 
 //Close the input stream
 br.close();
-     
+bw.close();     
+    
     }
     
     void pass_2(){
-        
+        BufferedReader br = null;
+		FileReader fr = null;
+                BufferedWriter bw = null;
+		FileWriter fw = null;
+
+		try {
+
+			//br = new BufferedReader(new FileReader(FILENAME));
+			fr = new FileReader("C:\\Users\\rithika\\Documents\\Assembler\\assembler_1\\obj_code1.txt");
+			br = new BufferedReader(fr);
+                        fw = new FileWriter("C:\\Users\\rithika\\Documents\\Assembler\\assembler_1\\obj_file.txt");
+			bw = new BufferedWriter(fw);
+                        
+			String sCurrentLine;
+
+			while ((sCurrentLine = br.readLine()) != null) {
+                            StringTokenizer st = new StringTokenizer(sCurrentLine," ");
+                            int count = st.countTokens();
+                              String tok_nm = st.nextToken();
+                              String tok_lb = st.nextToken();
+                              System.out.println(tok_lb);
+                              String obj_2="";
+                              obj_2=t.check_symtab(tok_lb);
+                               if("".equals(obj_2))
+                               {
+                                   bw.write(sCurrentLine);
+                               }
+                               if(st.hasMoreTokens())
+                               {
+                               String tok_x = st.nextToken();
+                               if("1".equals(tok_x))
+                               {
+                                   obj_2=c.addhex("8000",obj_2);
+                               }
+                                bw.write(tok_nm+obj_2);
+                               }
+                               
+                            //System.out.println(sCurrentLine);
+			}
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+
+		} finally {
+
+			try {
+
+				if (br != null)
+					br.close();
+
+				if (fr != null)
+					fr.close();
+                                if (bw != null)
+					bw.close();
+
+				if (fw != null)
+					fw.close();
+
+			} catch (IOException ex) {
+
+				ex.printStackTrace();
+
+			}
+
+		}
     }
     
     
     public static void main(String[] args) throws IOException {
         // TODO code application logic here
+        Assembler_1 a=new Assembler_1();
+        a.pass_1();
+        a.pass_2();
     }
+
+    
     
 }
+

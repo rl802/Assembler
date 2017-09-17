@@ -8,7 +8,7 @@ package assembler_1;
 import java.util.*;
 /**
  *
- * @authors Sanjana, Rithika
+ * @authors Rithika, Sanjana
  */
 public class tables {
      Map<String,String> optab;
@@ -60,18 +60,18 @@ public class tables {
     }
     
     String check_optab(String mnemon){
-        String addr=new String();
+        String addr="";
         if(optab.containsKey(mnemon)){
            addr=optab.get(mnemon);
            
         }
         else 
-            System.out.println("Mnemonic doesn't exist. Please check the SIC manul again");
+            addr="Mnemonic doesn't exist. Please check the SIC manul again";
         return addr;
     }
     
     String check_symtab(String sym){
-        String addr=new String();
+        String addr="";
         if(optab.containsKey(sym)){
            addr=optab.get(sym);
         }
