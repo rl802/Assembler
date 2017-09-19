@@ -33,7 +33,7 @@ void pass_1() throws FileNotFoundException, IOException{
         int locctr=0;
         String hex_code=" ";
         int len;
-        int index_bit=0;
+        
         // Open the file
 FileInputStream fstream = new FileInputStream("C:\\Users\\rithika\\Documents\\Assembler\\assembler_1\\textfile.txt");
 BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
@@ -44,8 +44,9 @@ String strLine;
 //Read File Line By Line
 while ((strLine = br.readLine()) != null)   {
   // Split command into separate tokens
+  int index_bit=0;
   String instr=strLine;
-  String[] str= strLine.split(",|\\s|\\r");
+  String[] str= strLine.split(",|\\s|\\r|\\t");
   len=str.length;
   /* Assigning addresses to each instruction */
   String hex_addr=" ";
@@ -64,14 +65,14 @@ while ((strLine = br.readLine()) != null)   {
                     locctr=locctr+(3*Integer.parseInt(str[2]));
             
             else
-                if(str[1].equals("BYTE"))
-                   locctr=locctr+1;
-                    
+                if(str[1].equals("BYTE") && (str[2].charAt(0)=='X'||str[2].charAt(0)=='C'))
+                   locctr=locctr+(str[2].length()-3);
+                else
+                    if(str[1].equals("BYTE") && !(str[2].charAt(0)=='X'||str[2].charAt(0)=='C'))
+                        locctr++;
                 else{
                     locctr=locctr+3;
-                    
-                    
-                }
+                    }
             
         }
   hex_addr=Integer.toHexString(locctr);
@@ -79,8 +80,13 @@ while ((strLine = br.readLine()) != null)   {
    if(str[1].equals("START")||str[0].equals("END"))
           continue;
   else
-      if(len==3)
-          t.create_symtab(str[0],hex_addr);
+      if(len==4){
+          t.create_symtab(str[0], hex_addr);
+          index_bit=1;
+      }
+   else
+      if(len==3 && !(str[2].equals("X")))
+          t.create_symtab(str[0],hex_addr);  
    
   if(str[1].equals("START")||str[0].equals("END"))
       continue;
@@ -91,18 +97,22 @@ else
       continue;
       }
   else
-      if(len==3){
+          if(len==4){
+            hex_code=t.check_optab(str[1]);  
+          }
+        else      
+      if(len==3 && str[2].equals("X")){
+        index_bit=1;  
+      hex_code=t.check_optab(str[0]);
+      }
+  else
+          if(len==3 && !(str[2].equals("X"))){
           
       hex_code=t.check_optab(str[1]);
       }
   else
           if(len==2)
-              hex_code=t.check_optab(str[0]);
-  
- 
-  
-  if(len==3 && str[2].equals("X"))
-      index_bit=1;
+              hex_code=t.check_optab(str[0]);  
   
     bw.write(hex_addr+"\t"+instr+"\t"+hex_code+"\t"+index_bit);
     bw.newLine();
@@ -115,12 +125,12 @@ bw.close();
     }
     
     void pass_2(){
-        t.print_symtab();
+        //t.print_symtab();
         BufferedReader br = null;
 		FileReader fr = null;
                 BufferedWriter bw = null;
 		FileWriter fw = null;
-                
+                String padding="000000";
 
 		try {
 
@@ -139,18 +149,36 @@ bw.close();
                               if(len==4){
                               str[2]=str[2]+"0000";
                               int hex=Integer.parseInt(str[2],16);
-                              String[] instr_str=str[1].split("\\s");
+                              String[] instr_str=str[1].split(",|\\s");
                               int instr_len=instr_str.length;
                               if(instr_len==2)
                               {obj_2=t.check_symtab(instr_str[1]);
-                              System.out.println(obj_2);}
+                              }
+                              /* Check for indexed mode */
                               else
-                                obj_2=t.check_symtab(instr_str[2]);  
+                                  if(instr_len==4)
+                                      obj_2=t.check_symtab(instr_str[2]);
+                              else
+                                  if(instr_len==3 && instr_str[2].equals("X"))
+                                obj_2=t.check_symtab(instr_str[1]);
+                              /* Other cases */
+                              else
+                                if(instr_len==3 && !(instr_str[2].equals("X")))
+                                {//System.out.println("You mad bruh");
+                                obj_2=t.check_symtab(instr_str[2]);
+                                }
                               int obj=Integer.parseInt(obj_2,16);
                               int address=hex+obj;
+                              String obj_code=Integer.toHexString(address);
+                              int ad_len=obj_code.length();
+                              if(ad_len<6){
+                                  obj_code=padding.substring(ad_len)+obj_code;
+                                  //System.out.println(obj_code+"\n");
+                              }
+                                  
                               if(str[3].equals("0")){
                                   
-                                  bw.write(str[0]+"\t"+str[1]+"\t"+Integer.toHexString(address)+"\t");
+                                  bw.write(str[0]+"\t"+str[1]+"\t"+obj_code+"\t");
                                   bw.newLine();
                               }
                               else{

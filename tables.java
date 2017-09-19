@@ -88,8 +88,12 @@ public class tables {
     }
     
      void print_symtab(){
-        for(String key: symtab.values())
-            System.out.println(key);
+         String bleh;
+        for(String key: symtab.keySet())
+        {bleh=symtab.get(key);
+            System.out.println(key+" "+bleh);
+        
+        }
     }
       
     
