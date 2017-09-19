@@ -31,7 +31,7 @@ public class Assembler_1 {
     
 void pass_1() throws FileNotFoundException, IOException{
         int locctr=0;
-        String hex_code="";
+        String hex_code=" ";
         int len;
         int index_bit=0;
         // Open the file
@@ -48,12 +48,12 @@ while ((strLine = br.readLine()) != null)   {
   String[] str= strLine.split(",|\\s|\\r");
   len=str.length;
   /* Assigning addresses to each instruction */
-  String hex_addr="";
+  String hex_addr=" ";
   if(str[0]==null)
       continue;
   if(str[1].equals("START")){
       if(str[2]!=null && !str[2].isEmpty())
-            locctr=Integer.parseInt(str[2])-3;
+            locctr=Integer.parseInt(str[2],16)-3;
       continue;
   }
         else{
@@ -82,9 +82,15 @@ while ((strLine = br.readLine()) != null)   {
       if(len==3)
           t.create_symtab(str[0],hex_addr);
    
-  if(str[1].equals("START")||str[0].equals("END")||str[1].equals("RESB")||str[1].equals("RESW")||str[1].equals("BYTE")||str[1].equals("WORD"))
+  if(str[1].equals("START")||str[0].equals("END"))
       continue;
 else
+      if(str[1].equals("RESB")||str[1].equals("RESW")||str[1].equals("BYTE")||str[1].equals("WORD")){
+          bw.write(hex_addr+"\t"+instr);
+          bw.newLine();
+      continue;
+      }
+  else
       if(len==3){
           
       hex_code=t.check_optab(str[1]);
@@ -114,6 +120,7 @@ bw.close();
 		FileReader fr = null;
                 BufferedWriter bw = null;
 		FileWriter fw = null;
+                
 
 		try {
 
@@ -126,35 +133,36 @@ bw.close();
 			String sCurrentLine;
 
 			while ((sCurrentLine = br.readLine()) != null) {
-                            StringTokenizer st = new StringTokenizer(sCurrentLine,"\t|\\s|\r");
-                            int count = st.countTokens();
-                              String tok_nm = st.nextToken();
-                              
-                              String tok_lb = st.nextToken();
-                              String tok_hc=  st.nextToken();
-                              String tok_ind= st.nextToken();
+                            String[] str= sCurrentLine.split("\\t");
+                            int len=str.length;
                               String obj_2="";
-                              tok_hc=tok_hc+"0000";
-                              int hex= Integer.parseInt(tok_hc,16);
-                              String[] str=tok_lb.split("\\s");
-                              int len=str.length;
-                              if(len==2)
-                              {obj_2=t.check_symtab(str[1]);
+                              if(len==4){
+                              str[2]=str[2]+"0000";
+                              int hex=Integer.parseInt(str[2],16);
+                              String[] instr_str=str[1].split("\\s");
+                              int instr_len=instr_str.length;
+                              if(instr_len==2)
+                              {obj_2=t.check_symtab(instr_str[1]);
                               System.out.println(obj_2);}
                               else
-                                obj_2=t.check_symtab(str[2]);  
+                                obj_2=t.check_symtab(instr_str[2]);  
                               int obj=Integer.parseInt(obj_2,16);
                               int address=hex+obj;
-                              if(tok_ind.equals("0")){
+                              if(str[3].equals("0")){
                                   
-                                  bw.write(tok_nm+"\t"+tok_lb+"\t"+Integer.toHexString(address)+"\t");
+                                  bw.write(str[0]+"\t"+str[1]+"\t"+Integer.toHexString(address)+"\t");
+                                  bw.newLine();
                               }
                               else{
                                   int fin_address=address+Integer.parseInt("8000",16);
-                                  bw.write(tok_nm+"\t"+tok_lb+"\t"+Integer.toHexString(fin_address)+"\t");
+                                  bw.write(str[0]+"\t"+str[1]+"\t"+Integer.toHexString(fin_address)+"\t");
+                                  bw.newLine();
                               }
-                                
-                               
+                            }
+                              else{
+                                bw.write(str[0]+"\t"+str[1]); 
+                                bw.newLine();
+                              }
                             //System.out.println(sCurrentLine);
 			}
 
